@@ -17,6 +17,10 @@ app.post('/login', handleLogin)
 
 const httpServer = http.createServer(app)
 
+const getContext = ({ req }) => {
+  return { auth: req.auth }
+}
+
 const typeDefs = await readFile('./schema.graphql', 'utf8')
 
 const apolloServer = new ApolloServer({
@@ -26,7 +30,7 @@ const apolloServer = new ApolloServer({
 })
 await apolloServer.start()
 
-app.use('/graphql', apolloMiddleware(apolloServer))
+app.use('/graphql', apolloMiddleware(apolloServer, { context: getContext }))
 
 app.listen({ port: PORT }, () => {
   console.log(`Server running on port ${PORT}`)

@@ -1,6 +1,13 @@
 import { GraphQLError } from 'graphql'
 import { getCompany } from './db/companies.js'
-import { getJob, getJobs, getJobsByCompany } from './db/jobs.js'
+import {
+  createJob,
+  deleteJob,
+  getJob,
+  getJobs,
+  getJobsByCompany,
+  updateJob,
+} from './db/jobs.js'
 
 export const resolvers = {
   Query: {
@@ -28,6 +35,32 @@ export const resolvers = {
     },
   },
 
+  Mutation: {
+    createJob: async (_root, args, context) => {
+      const { title, description } = args.input
+      const { auth } = context
+
+      if (!auth) {
+        throw unauthorizedError('Missing authentication')
+      }
+
+      const companyId = 'Gu7QW9LcnF5d'
+      const job = await createJob({ title, description, companyId })
+      return job
+    },
+
+    deleteJob: async (_root, args) => {
+      const { id } = args
+      const job = await deleteJob(id)
+      return job
+    },
+    updateJob: async (_root, args) => {
+      const { id, title, description } = args.input
+      const job = await updateJob({ id, title, description })
+      return job
+    },
+  },
+
   Job: {
     date: (job) => job.createdAt.slice(0, 'yyyy-mm-dd'.length),
     company: async (job) => await getCompany(job.companyId),
@@ -41,5 +74,11 @@ export const resolvers = {
 const notFoundError = (message) => {
   return new GraphQLError(message, {
     extensions: { code: 'NOT_FOUND' },
+  })
+}
+
+const unauthorizedError = (message) => {
+  return new GraphQLError(message, {
+    extensions: { code: 'UNAUTHORIZED' },
   })
 }
