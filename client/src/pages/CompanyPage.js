@@ -1,39 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useParams } from 'react-router'
-import { getCompanyById } from '../lib/graphql/queries'
 import JobList from '../components/JobList'
+import { useCompany } from '../lib/graphql/customHooks'
 
 function CompanyPage() {
-  const [state, setState] = useState({
-    loading: true,
-    company: null,
-    error: false,
-  })
-
   const { companyId } = useParams()
 
-  useEffect(() => {
-    const getComapny = async () => {
-      try {
-        const company = await getCompanyById(companyId)
-        setState({
-          company: company,
-          loading: false,
-          error: false,
-        })
-      } catch (error) {
-        setState({
-          company: null,
-          loading: false,
-          error: true,
-        })
-      }
-    }
+  const { loading, company, error } = useCompany(companyId)
 
-    getComapny()
-  }, [companyId])
-
-  const { company, loading, error } = state
+  //console.log(company)
 
   if (loading) {
     return <div>Loading...</div>

@@ -7,6 +7,7 @@ import http from 'http'
 import { readFile } from 'node:fs/promises'
 import { resolvers } from './resolvers.js'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { getUser } from './db/users.js'
 
 const PORT = 9000
 
@@ -17,8 +18,14 @@ app.post('/login', handleLogin)
 
 const httpServer = http.createServer(app)
 
-const getContext = ({ req }) => {
-  return { auth: req.auth }
+const getContext = async ({ req }) => {
+  //console.log(req)
+  if (req.auth) {
+    const user = await getUser(req.auth.sub)
+    return { user }
+  }
+
+  return {}
 }
 
 const typeDefs = await readFile('./schema.graphql', 'utf8')
