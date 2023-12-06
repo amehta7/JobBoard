@@ -1,7 +1,6 @@
 {
   "name": "job-board-server",
   "private": true,
-  "license": "MIT",
   "type": "module",
   "scripts": {
     "start": "nodemon server.js"
